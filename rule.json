@@ -10,16 +10,10 @@
             "has": [
                 {
                     "table": "buff_rule",
-                    "by": "rule_id",
-                    "to": "id"
-                },
-                {
-                    "table": "buff_rule",
-                    "by": "rule_id",
-                    "to": "id"
-                },
-                {
-                    "table": "buff_rule",
+                    "between": [
+                        0,
+                        2147483647
+                    ],
                     "by": "rule_id",
                     "to": "id"
                 }
@@ -35,7 +29,101 @@
             "has": [
                 {
                     "table": "entity_effect",
+                    "between": [
+                        0,
+                        1999999
+                    ],
                     "by": "effect_ids",
+                    "to": "id"
+                },
+                {
+                    "table": "entity_effect2",
+                    "between": [
+                        2000000,
+                        2147483647
+                    ],
+                    "by": "effect_ids",
+                    "to": "id"
+                }
+            ]
+        },
+        {
+            "table": "entity_effect2",
+            "exclude": [],
+            "has": [
+                {
+                    "table": "entity_effect2",
+                    "between": [
+                        0,
+                        2147483647
+                    ],
+                    "by": "next_effect_id",
+                    "to": "id"
+                }
+            ]
+        },
+        {
+            "table": "item_artifact_config_type2",
+            "exclude": [],
+            "has": [
+                {
+                    "table": "config_get_type",
+                    "between": [
+                        0,
+                        2147483647
+                    ],
+                    "by": "access_type_id",
+                    "to": "id"
+                }
+            ]
+        },
+        {
+            "table": "other_shop_goods",
+            "exclude": [],
+            "has": [
+                {
+                    "table": "item_gift",
+                    "between": [
+                        14000,
+                        15999
+                    ],
+                    "by": "item_id",
+                    "to": "id"
+                },
+                {
+                    "table": "item_material",
+                    "between": [
+                        10000,
+                        13999
+                    ],
+                    "by": "item_id",
+                    "to": "id"
+                },
+                {
+                    "table": "item_spirit",
+                    "between": [
+                        17000,
+                        17999
+                    ],
+                    "by": "item_id",
+                    "to": "id"
+                },
+                {
+                    "table": "item_money",
+                    "between": [
+                        18000,
+                        18999
+                    ],
+                    "by": "item_id",
+                    "to": "id"
+                },
+                {
+                    "table": "item_material",
+                    "between": [
+                        100000,
+                        109999
+                    ],
+                    "by": "item_id",
                     "to": "id"
                 }
             ]
