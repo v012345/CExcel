@@ -1,0 +1,44 @@
+{
+    "has_one_condition": [
+        {
+            "table": "buff_base",
+            "exclude": [
+                1,
+                2,
+                4
+            ],
+            "has": [
+                {
+                    "table": "buff_rule",
+                    "by": "rule_id",
+                    "to": "id"
+                },
+                {
+                    "table": "buff_rule",
+                    "by": "rule_id",
+                    "to": "id"
+                },
+                {
+                    "table": "buff_rule",
+                    "by": "rule_id",
+                    "to": "id"
+                }
+            ]
+        },
+        {
+            "table": "action_attack",
+            "exclude": [
+                1,
+                2,
+                4
+            ],
+            "has": [
+                {
+                    "table": "entity_effect",
+                    "by": "effect_ids",
+                    "to": "id"
+                }
+            ]
+        }
+    ]
+}
