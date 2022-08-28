@@ -13,7 +13,6 @@ Table::Table(std::string path)
         head.insert(std::make_pair(value.get<std::string>(), index));
         index++;
     }
-   
     this->head = head;
 }
 std::string Table::getName()
@@ -102,19 +101,25 @@ std::vector<OpenXLSX::XLCellValue> Table::getColumn(std::string column_name)
         OpenXLSX::XLRowIterator row = sheet.rows().begin();
         row++;
         std::vector<OpenXLSX::XLCellValue> column_data;
-        int i = 0;
+        ;
         while (row != this->sheet.rows().end())
         {
-            OpenXLSX::XLCellValue m = std::vector<OpenXLSX::XLCellValue>(row->values()).at(this->head.at(column_name));
-            column_data.push_back(m);
-            if (i == 5465)
+            try
             {
-                std::cout << i++ << std::endl;
-            }
-            i++;
+                OpenXLSX::XLCellValue m = std::vector<OpenXLSX::XLCellValue>(row->values()).at(this->head.at(column_name));
+                if (m.type() == OpenXLSX::XLValueType::Empty)
+                    break;
+                column_data.push_back(m);
 
-            row++;
+                row++;
+            }
+            catch (const std::exception &e)
+            {
+                std::cout << "does " << this->name << " have " << this->sheet.rowCount() << " rows? I think it has some blank rows" << std::endl;
+                break;
+            }
         }
+        std::cout << this->name << " have " << column_data.size() << " rows" << std::endl;
         this->data.insert(std::make_pair(column_name, column_data));
     }
     return this->data.at(column_name);
