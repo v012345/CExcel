@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 #include <sstream>
-// #include <filesystem>
+#include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <typeinfo>
@@ -16,97 +16,64 @@ using namespace std::chrono;
 // namespace fs = std::filesystem;
 using json = nlohmann::json;
 using namespace OpenXLSX;
-namespace my
-{
 
-    class fn_object_class
-    {
-        // Overload () operator
-    public:
-        void operator()(int i, json rule)
-        {
-            // 切出主表
-            json has_one_conditions = rule["has_one_condition"];
-            json has_one_relationship = has_one_conditions[i];
-            std::cout << "======= dealing with " << has_one_relationship["table"].get<std::string>() << std::endl;
-            std::string main_table_name = "./xlsx/" + has_one_relationship["table"].get<std::string>() + ".xlsx";
-
-            Table main_table(main_table_name);
-            std::map<std::string, std::uint32_t> table_head = main_table.getHead();
-            // std::vector<OpenXLSX::XLCellValue> cc = main_table.getColumn("id");
-            std::vector<json> has_ones = has_one_relationship["has"].get<std::vector<json>>();
-            for (size_t i = 0; i < has_ones.size(); i++)
-            {
-                json foreign_table = has_ones[i];
-                std::string foreign_key_name = foreign_table["by"].get<std::string>();
-                main_table.insertForeignKeys(foreign_key_name);
-            }
-
-            //开打从表
-            for (size_t i = 0; i < has_ones.size(); i++)
-            {
-
-                json foreign = has_ones[i];
-                std::string foreign_table_name = "./xlsx/" + foreign["table"].get<std::string>() + ".xlsx";
-                Table foreign_table(foreign_table_name);
-                foreign_table.setPrimaryKey(foreign["to"].get<std::string>());
-
-                std::set<int32_t> foreign_id = foreign_table.getPrimaryKey();
-                std::set<int32_t> main_idsss = main_table.getForeignKey(foreign["by"].get<std::string>());
-                std::vector<int> bewteen = foreign["between"].get<std::vector<int>>();
-                for (auto &i : main_idsss)
-                {
-                    if (i >= bewteen[0] && i <= bewteen[1])
-                    {
-                        if (foreign_id.find(i) == foreign_id.end())
-                        {
-
-                            std::cout << main_table.getName() << " " << foreign["by"].get<std::string>() << " has " << i << std::endl;
-                            std::cout << "but " << foreign_table.getName() << " " << foreign["to"].get<std::string>() << " missing " << i << std::endl;
-                        }
-                    }
-                }
-            }
-            std::cout << " ====== done" << std::endl;
-        }
-    };
-}
 int main()
 {
+    system(".\\xls2xlsx_Master.exe");
     auto start = high_resolution_clock::now();
-  
-    // t2.join();
-    // t2.join();
     // 项目缺少 xls 转 xlsx 的功能 , 现在有 昊喆 的 py 帮转
-
     // 读取规则文件
-
     json rule;
     std::ifstream i("rule.json");
     i >> rule;
 
     // 处理 has one 的关系
-    json has_one_conditions = rule["has_one_condition"];
-    std::vector<std::thread> ths;
-    for (size_t i = 0; i < has_one_conditions.size(); i++)
+    json has_one_conditions = rule["has_one_conditions"];
+    for (auto& has_one_condition : has_one_conditions)
+    {
+        std::string main_table_name = has_one_condition["table"].get<std::string>();
+        std::string main_table_path = "./xlsx/" + main_table_name + ".xlsx";
+        Table main_table(main_table_path, main_table_name);
 
-    {
-        ths.push_back(std::thread(my::fn_object_class(), i, rule));
-    }
-    for (auto &th : ths)
-    {
-        th.join();
+        std::cout << "====== " << main_table.getName() << " ====== " << std::endl;
+        std::vector<json> has_ones = has_one_condition["has"].get<std::vector<json>>();
+
+        //开打从表
+        for (auto& has_one : has_ones)
+        {
+            main_table.insertForeignKeys(has_one["by"].get<std::string>());
+            std::string foreign_table_name = "./xlsx/" + has_one["table"].get<std::string>() + ".xlsx";
+            Table foreign_table(foreign_table_name, has_one["table"].get<std::string>());
+            foreign_table.setPrimaryKey(has_one["to"].get<std::string>());
+
+            std::set<int32_t> foreign_id = foreign_table.getPrimaryKey();
+            std::set<int32_t> main_idsss = main_table.getForeignKey(has_one["by"].get<std::string>());
+            std::vector<int> bewteen = has_one["between"].get<std::vector<int>>();
+            for (auto& i : main_idsss)
+            {
+                if (i >= bewteen[0] && i <= bewteen[1] && foreign_id.find(i) == foreign_id.end())
+                {
+                    std::cout << main_table.getName() << " column(" << has_one["by"].get<std::string>() << ") has " << i;
+                    std::cout << ", but " << foreign_table.getName() << " column(" << has_one["to"].get<std::string>() << ") miss " << i << std::endl;
+                }
+            }
+        }
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-
-    // To get the value of duration use the count()
-    // member function on the duration object
-    std::cout << duration.count() << std::endl;
+    std::cout << "run time " << duration.count() / 1000000 << " s" << std::endl;
+    system("pause");
     return 0;
 }
 
+// std::vector<std::thread> ths;
+// // ths.push_back(std::thread(my::fn_object_class(), i, rule));
+// for (auto &th : ths)
+// {
+//     // th.join();
+// }
 
+// system("pause");
 
 // CPP program to demonstrate multithreading
 // // using three different callables.

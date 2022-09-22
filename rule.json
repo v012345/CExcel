@@ -1,5 +1,5 @@
 {
-    "has_one_condition": [
+    "has_one_conditions": [
         {
             "table": "buff_base",
             "exclude": [

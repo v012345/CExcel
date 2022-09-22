@@ -15,6 +15,22 @@ Table::Table(std::string path)
     }
     this->head = head;
 }
+Table::Table(std::string path, std::string name)
+{
+    this->name = name;
+    this->table.open(path);
+    this->sheet = table.workbook().worksheet(table.workbook().worksheetNames()[0]);
+
+    std::map<std::string, std::uint32_t> head;
+    OpenXLSX::XLRowIterator row = sheet.rows().begin();
+    int index = 0;
+    for (auto &value : std::vector<OpenXLSX::XLCellValue>(row->values()))
+    {
+        head.insert(std::make_pair(value.get<std::string>(), index));
+        index++;
+    }
+    this->head = head;
+}
 std::string Table::getName()
 {
     return this->name;
@@ -67,7 +83,7 @@ void Table::insertForeignKeys(std::string foreign_key)
                 }
                 catch (const std::exception &e)
                 {
-                    std::cout << "table " << this->name << " column " << foreign_key << " has a value " << segment << " which can convert to int" << std::endl;
+                    std::cout << this->name << " column(" << foreign_key << ") has a value " << segment << " which can convert to int" << std::endl;
                     // std::cerr << e.what() << '\n';
                 }
             }
@@ -115,11 +131,11 @@ std::vector<OpenXLSX::XLCellValue> Table::getColumn(std::string column_name)
             }
             catch (const std::exception &e)
             {
-                std::cout << "does " << this->name << " have " << this->sheet.rowCount() << " rows? I think it has some blank rows" << std::endl;
+                // std::cout << "does " << this->name << " have " << this->sheet.rowCount() << " rows? I think it has some blank rows" << std::endl;
                 break;
             }
         }
-        std::cout << this->name << " have " << column_data.size() << " rows" << std::endl;
+        // std::cout << this->name << " have " << column_data.size() << " rows" << std::endl;
         this->data.insert(std::make_pair(column_name, column_data));
     }
     return this->data.at(column_name);

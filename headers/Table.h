@@ -9,7 +9,6 @@ class Table
 private:
     std::string name;
     // xlsx 文件
-
     OpenXLSX::XLDocument table;
     // xlsx 文件左下角的分页
     OpenXLSX::XLWorksheet sheet;
@@ -23,6 +22,7 @@ private:
 
 public:
     Table(std::string path);
+    Table(std::string path,std::string name);
     std::map<std::string, std::uint32_t> getHead();
     std::vector<OpenXLSX::XLCellValue> getColumn(std::string column_name);
     std::map<std::string, std::set<std::int32_t>> getForeignKeys();
